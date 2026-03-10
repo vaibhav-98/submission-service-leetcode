@@ -1,4 +1,5 @@
 const fp = require('fastify-plugin');
+
 class TodoRepository {
     constructor(db) {
         this.db = db;

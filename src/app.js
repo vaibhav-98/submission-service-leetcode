@@ -2,7 +2,7 @@ const fp = require('fastify-plugin')
 const apiRouter = require('./routers/apiRouter')
 const db = require('./db/index')
 const todoRepository = require('./repository/todoRepository')
-const todoService = require('./services/todoService')
+const todoService = require('./services/servicePlugin')
 
 async function app(fastify, option) {
                                         
