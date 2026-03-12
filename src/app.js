@@ -1,16 +1,24 @@
-const fp = require('fastify-plugin')
-const apiRouter = require('./routers/apiRouter')
-const db = require('./db/index')
-const todoRepository = require('./repository/todoRepository')
-const todoService = require('./services/servicePlugin')
+const fastifyPlugin = require('fastify-plugin');
+const servicePlugin = require('./services/servicePlugin');
+const repopsitoryPlugin = require('./repositories/repositoryPlugin');
+const todoRoutes = require('./routes/api/v1/submissionRoutes');
 
-async function app(fastify, option) {
-                                        
-   await fastify.register(db)
-   await fastify.register(todoRepository)
-   await fastify.register(todoService)
-   await fastify.register(apiRouter , {prefix: '/api'})
+/**
+ * 
+ * @param {Fastify object} fastify 
+ * @param {*} options 
+ */
+async function app(fastify, options) {
+    await fastify.register(require('@fastify/cors'));
+    await fastify.register(repopsitoryPlugin);
+    await fastify.register(servicePlugin);
+
+    await fastify.register(todoRoutes, {prefix: '/todos'});
+
+    // register test routes
+    await fastify.register(require('./routes/api/apiRoutes'), {prefix: '/api'});
+
+
 }
 
-
-module.exports = fp(app)
+module.exports = fastifyPlugin(app);
