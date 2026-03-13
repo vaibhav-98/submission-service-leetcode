@@ -1,5 +1,5 @@
 const { createSubmission } = require('../controllers/submissionController');
-const Submission = require('../models/submissionModel');
+const Submission = require('../models/submissionModels');
 
 class SubmissionRepository {
     constructor() {

@@ -3,7 +3,7 @@ const app = require('./app');
 const connectToDB = require('./config/dbConfig');
 const serverConfig = require('./config/serverConfig');
 const errorHandler = require('./utils/errorHandler');
-const evaluationWorker = require('./workers/evaluationWorker');
+//const evaluationWorker = require('./workers/evaluationWorker');
 
 fastify.register(app);
 fastify.setErrorHandler(errorHandler);
@@ -15,6 +15,6 @@ fastify.listen({ port: serverConfig.PORT }, async (err) => {
     }
     await connectToDB();
 
-    evaluationWorker("EvaluationQueue");
+    //evaluationWorker("EvaluationQueue");
     console.log(`Server up at port ${serverConfig.PORT}`);
 });

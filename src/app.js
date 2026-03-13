@@ -1,6 +1,6 @@
 const fastifyPlugin = require('fastify-plugin');
 const servicePlugin = require('./services/servicePlugin');
-const repopsitoryPlugin = require('./repositories/repositoryPlugin');
+const repopsitoryPlugin = require('./repository/repositoryPlugin');
 const todoRoutes = require('./routes/api/v1/submissionRoutes');
 
 /**
