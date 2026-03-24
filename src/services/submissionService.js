@@ -49,6 +49,9 @@ class SubmissionService {
             }
         });
 
+        //console.log("respone in service ", response);
+        
+
         // TODO: Add handling of all testcases here .
         return {queueResponse: response, submission};
         
