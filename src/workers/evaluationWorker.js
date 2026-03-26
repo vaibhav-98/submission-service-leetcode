@@ -1,20 +1,43 @@
 const { Worker } = require('bullmq');
 const redisConnection = require('../config/redisConfig');
 const axios = require('axios');
+const Submission = require('../models/submissionModels');
 
 function evaluationWorker(queue) {
     new Worker('EvaluationQueue', async job => {
         if (job.name === 'EvaluationJob') {
-
             try {
-                const response = await axios.post('http://localhost:3001/sendPayload', {
-                    userId: job.data.userId,
+                const { response, submissionId, userId } = job.data;
+                
+                console.log("Processing evaluation for submission:", submissionId);
+                console.log("Response:", response);
+
+                // Map status from Evaluator to Submission DB status
+                let finalStatus = "Success";
+                if (response.status === "WA") {
+                    finalStatus = "WA";
+                } else if (response.status === "ERROR") {
+                    finalStatus = "RE";
+                    if (response.output === "TLE") finalStatus = "TLE";
+                } else if (response.status !== "SUCCESS") {
+                    finalStatus = "RE";
+                }
+
+                // Update the database
+                await Submission.findByIdAndUpdate(submissionId, {
+                    status: finalStatus,
+                    output: response.output
+                });
+
+                // Notify other services (e.g., Socket Service / Frontend)
+                await axios.post('http://localhost:3001/sendPayload', {
+                    userId: userId,
                     payload: job.data
-                })
-               // console.log("this is respone",response);
-                console.log(job.data);
+                });
+
+                console.log(`✅ Submission ${submissionId} updated setting to ${finalStatus}`);
             } catch(error) {
-                console.log(error)
+                console.log("❌ Worker Error:", error);
             }
         }
     }, {
@@ -22,7 +45,7 @@ function evaluationWorker(queue) {
     });
 }
 
-console.log("abc", evaluationWorker);
+//console.log("abc", evaluationWorker);
 
 
 module.exports = evaluationWorker;
@@ -30,64 +53,3 @@ module.exports = evaluationWorker;
 
 
 
-// const { Worker } = require('bullmq');
-// const redisConnection = require('../config/redisConfig');
-// const Submission = require('../models/submissionModels');
-// const axios = require('axios');
-
-// function evaluationWorker() {
-
-//     console.log("🚀 Worker started...");
-
-//     new Worker('EvaluationQueue', async job => {
-//          if (job.name === 'EvaluationJob') {
-//        console.log("🔥 Job received:", job.data);
-
-//         const data = job.data;
-// const submissionId = data.submissionId;
-
-//         console.log("Processing submission:", submissionId);
-
-//         try {
-//             const response = await axios.post(
-//                 'http://localhost:3001/sendPayload',
-//                 data   // ✅ full payload
-//             );
-
-//             const result = response.data;
-
-//             console.log("✅ Execution Result:", result);
-
-//             let finalStatus = "Success";
-
-//             if (result.status !== "SUCCESS") {
-//                 finalStatus = "RE";
-//             } else if (result.output.trim() !== data.outputCase.trim()) {
-//                 finalStatus = "WA";
-//             }
-
-//             await Submission.findByIdAndUpdate(submissionId, {
-//                 status: finalStatus,
-//                 output: result.output
-//             });
-
-//         } catch (error) {
-//             console.log("❌ Worker Error:", error.message);
-
-//             if (error.response) {
-//                 console.log("❌ Evaluator Error:", error.response.data);
-//             }
-
-//             await Submission.findByIdAndUpdate(submissionId, {
-//                 status: "RE",
-//                 error: error.message
-//             });
-//         }
-
-//          }
-//     }, {
-//         connection: redisConnection
-//     });
-// }
-
-// module.exports = evaluationWorker;
