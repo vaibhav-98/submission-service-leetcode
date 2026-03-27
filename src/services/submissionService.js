@@ -41,18 +41,15 @@ class SubmissionService {
              [submission._id]: {
                 code: submission.code,
                 language: submission.language,
-                inputCase: problemAdminApiResponse.data.testCases[0].input,
-                outputCase: problemAdminApiResponse.data.testCases[0].output,
+                testCases: problemAdminApiResponse.data.testCases,
                 userId,
                 submissionId: submission._id
-
             }
         });
 
         //console.log("respone in service ", response);
         
 
-        // TODO: Add handling of all testcases here .
         return {queueResponse: response, submission};
         
      }

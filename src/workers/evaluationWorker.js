@@ -16,6 +16,8 @@ function evaluationWorker(queue) {
                 let finalStatus = "Success";
                 if (response.status === "WA") {
                     finalStatus = "WA";
+                } else if (response.status === "CE") {
+                    finalStatus = "CE";
                 } else if (response.status === "ERROR") {
                     finalStatus = "RE";
                     if (response.output === "TLE") finalStatus = "TLE";
